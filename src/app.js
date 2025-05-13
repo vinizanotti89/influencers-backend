@@ -1,12 +1,19 @@
+console.log('[DEBUG] Starting app.js');
+
 import express from 'express';
 import cors from 'cors';
 import mongoose from 'mongoose';
 import helmet from 'helmet';
 import morgan from 'morgan';
+console.log('[DEBUG] core modules imported');
 import dotenv from 'dotenv';
+console.log('[DEBUG] dotenv loaded');
 import logger from './config/logger.js';
+console.log('[DEBUG] custom modules imported');
 import apiRoutes from './routes/api.js';
 import socialApiRoutes from './routes/socialApiRoutes.js';
+
+
 
 // Carregar variáveis de ambiente
 dotenv.config();
