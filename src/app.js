@@ -17,7 +17,9 @@ const app = express();
 
 // Middlewares
 app.use(helmet()); // Segurança HTTP
-app.use(cors()); // Permitir cross-origin requests
+app.use(cors({
+  origin: 'https://frontendpaineladm.vercel.app'
+})); // Permitir cross-origin requests
 app.use(express.json()); // Parsear JSON
 app.use(express.urlencoded({ extended: true })); // Parsear URL-encoded
 
