@@ -1,0 +1,54 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+  scrape_timeout: 10s
+
+# Regras de alerta
+rule_files:
+  - "/etc/prometheus/rules/*.yml"
+
+scrape_configs:
+  - job_name: 'influencer-dashboard'
+    scrape_interval: 10s
+    metrics_path: '/metrics'
+    static_configs:
+      - targets: ['node-app:3001']
+    relabel_configs:
+      - source_labels: [__address__]
+        regex: '.*'
+        target_label: instance
+        replacement: 'influencer-dashboard'
+
+  - job_name: 'prometheus'
+    scrape_interval: 15s
+    static_configs:
+      - targets: ['localhost:9090']
+
+  - job_name: 'mongodb'
+    static_configs:
+      - targets: ['mongodb-exporter:9216']
+
+  - job_name: 'redis'
+    static_configs:
+      - targets: ['redis-exporter:9121']
+
+# Alerting
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets:
+          - 'alertmanager:9093'
+
+# Configurações de armazenamento
+storage:
+  tsdb:
+    path: /prometheus
+    retention:
+      time: 30d
+      size: 10GB
+
+# Configurações do servidor web
+web:
+  listen_address: 0.0.0.0:9090
+  external_url: http://prometheus:9090
+  page_title: Prometheus - Influencer Dashboard Monitoring

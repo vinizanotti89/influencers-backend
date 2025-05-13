@@ -1,0 +1,52 @@
+# Multi-stage build para produção
+# Fase 1: Construção
+FROM node:18-alpine as builder
+
+WORKDIR /app
+
+# Copiar arquivos de configuração de pacotes
+COPY package*.json ./
+
+# Instalar dependências de construção
+RUN npm ci --only=production
+
+# Copiar o código fonte
+COPY . .
+
+# Executar testes (descomente se necessário)
+# RUN npm test
+
+# Fase 2: Produção
+FROM node:18-alpine
+
+# Criar usuário não-root para melhorar segurança
+RUN addgroup -S appgroup && adduser -S appuser -G appgroup
+
+# Definir diretório de trabalho
+WORKDIR /app
+
+# Configurar variáveis de ambiente
+ENV NODE_ENV=production
+ENV NODE_PATH=/app/src
+ENV PORT=3001
+
+# Copiar dependências e arquivos de build da fase anterior
+COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app/package*.json ./
+COPY --from=builder /app/src ./src
+
+# Criar diretório de logs com permissões apropriadas
+RUN mkdir -p /app/logs && chown -R appuser:appgroup /app/logs
+
+# Expor porta
+EXPOSE 3001
+
+# Mudar para usuário não-root
+USER appuser
+
+# Healthcheck para verificar se a aplicação está respondendo
+HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
+    CMD wget --no-verbose --tries=1 --spider http://localhost:3001/health || exit 1
+
+# Iniciar aplicação
+CMD ["node", "src/app.js"]

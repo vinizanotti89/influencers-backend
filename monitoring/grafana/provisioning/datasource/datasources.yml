@@ -1,0 +1,71 @@
+apiVersion: 1
+
+deleteDatasources:
+  - name: Prometheus
+    orgId: 1
+
+datasources:
+  - name: Prometheus
+    type: prometheus
+    access: proxy
+    orgId: 1
+    url: http://prometheus:9090
+    basicAuth: false
+    isDefault: true
+    version: 1
+    editable: false
+    uid: "${DS_PROMETHEUS}"
+    jsonData:
+      timeInterval: "5s"
+      queryTimeout: "60s"
+      httpMethod: "POST"
+      manageAlerts: true
+      prometheusType: "Prometheus"
+      prometheusVersion: "2.40.0"
+      cacheLevel: "High"
+      disableRecordingRules: false
+      incrementalQueryOverlapWindow: "10m"
+      exemplarTraceIdDestinations:
+        - name: "TraceID"
+          datasourceUid: "${DS_TEMPO}"
+  
+  - name: Loki
+    type: loki
+    access: proxy
+    orgId: 1
+    url: http://loki:3100
+    basicAuth: false
+    isDefault: false
+    version: 1
+    editable: false
+    uid: "${DS_LOKI}"
+    jsonData:
+      maxLines: 1000
+      derivedFields:
+        - name: "TraceID"
+          matcherRegex: "traceID=(\\w+)"
+          url: "${DS_TEMPO}/traces/$${__value.raw}"
+          datasourceUid: "${DS_TEMPO}"
+
+  - name: Tempo
+    type: tempo
+    access: proxy
+    orgId: 1
+    url: http://tempo:3200
+    basicAuth: false
+    isDefault: false
+    version: 1
+    editable: false
+    uid: "${DS_TEMPO}"
+    jsonData:
+      nodeGraph:
+        enabled: true
+      lokiSearch:
+        datasourceUid: "${DS_LOKI}"
+      tracesToLogs:
+        datasourceUid: "${DS_LOKI}"
+        spanStartTimeShift: "-1m"
+        spanEndTimeShift: "1m"
+        tags: ["instance", "service"]
+        filterByTraceID: true
+        filterBySpanID: true

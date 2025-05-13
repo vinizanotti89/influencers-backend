@@ -1,0 +1,84 @@
+apiVersion: 1
+
+groups:
+  - name: memory-alerts
+    folder: Alerts
+    interval: 60s
+    rules:
+      - name: "Alert Test"
+        condition: $A
+        data:
+          - refId: A
+            datasourceUid: prometheus
+            model:
+              expr: 'rate(http_request_duration_seconds_sum[5m]) / rate(http_request_duration_seconds_count[5m]) > 2'
+        noDataState: NoData
+        execErrState: Error
+        for: 5m
+        annotations:
+          summary: "Requisições API estão levando mais de 2 segundos em média"
+
+      - name: "High CPU Usage"
+        condition: $A
+        data:
+          - refId: A
+            datasourceUid: prometheus
+            model:
+              expr: 'rate(process_cpu_seconds_total[5m]) * 100 > 80'
+        noDataState: NoData
+        execErrState: Error
+        for: 5m
+        annotations:
+          summary: "High CPU usage detected"
+
+      - name: "High Memory Usage"
+        condition: $A
+        data:
+          - refId: A
+            datasourceUid: prometheus
+            model:
+              expr: '(process_resident_memory_bytes / machine_memory_bytes) * 100 > 85'
+        noDataState: NoData
+        execErrState: Error
+        for: 5m
+        annotations:
+          summary: "High memory usage detected"
+
+      - name: "High Response Time"
+        condition: $A
+        data:
+          - refId: A
+            datasourceUid: prometheus
+            model:
+              expr: 'rate(http_request_duration_seconds_sum[5m]) / rate(http_request_duration_seconds_count[5m]) > 2'
+        noDataState: NoData
+        execErrState: Error
+        for: 3m
+        annotations:
+          summary: "High response time detected"
+
+      - name: "High Error Rate"
+        condition: $A
+        data:
+          - refId: A
+            datasourceUid: prometheus
+            model:
+              expr: 'sum(rate(http_requests_total{status=~"5.."}[5m])) / sum(rate(http_requests_total[5m])) * 100 > 5'
+        noDataState: NoData
+        execErrState: Error
+        for: 2m
+        annotations:
+          summary: "High error rate detected"
+
+      - name: "Application Down"
+        condition: $A
+        data:
+          - refId: A
+            datasourceUid: prometheus
+            model:
+              expr: 'up{job="influencer-dashboard"} == 0'
+        noDataState: NoData
+        execErrState: Error
+        for: 1m
+        annotations:
+          summary: "Application is down"

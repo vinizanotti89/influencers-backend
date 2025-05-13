@@ -1,0 +1,53 @@
+# Ignorar diretórios externos
+../
+../../
+
+# Arquivos do sistema operacional
+.DS_Store
+Thumbs.db
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+desktop.ini
+
+# Arquivos de ambiente
+.env
+.env.local
+.env.development
+.env.test
+.env.production
+.env.*
+
+# Arquivos de log
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Dependências
+node_modules/
+/.pnp
+.pnp.js
+
+# Arquivos de build
+/build/
+/dist/
+/dist-ssr/
+/out/
+/.next/
+.vite/
+
+# Arquivos de cache
+.cache/
+.eslintcache
+.stylelintcache
+
+# Arquivos temporários
+*.swp
+*.swo
+*~
+.temp
+.tmp

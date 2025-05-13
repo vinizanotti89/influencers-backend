@@ -1,0 +1,227 @@
+apiVersion: 1
+
+groups:
+  - orgId: 1
+    name: "production-monitoring"
+    folder: "Production Alerts"
+    interval: 60s
+    rules:
+      - uid: high_cpu_usage
+        title: "High CPU Usage"
+        condition: A
+        data:
+          - refId: A
+            datasourceUid: "${DS_PROMETHEUS}"
+            model:
+              expr: 'rate(process_cpu_seconds_total[5m]) * 100 > 70'
+        noDataState: NoData
+        execErrState: Error
+        for: 5m
+        labels:
+          severity: warning
+          environment: production
+          service: influencer-dashboard
+        annotations:
+          summary: "High CPU usage detected"
+          description: "CPU usage has been above 70% for 5 minutes. Current value: {{ $value }}%"
+          runbook_url: "https://wiki.example.com/runbooks/high-cpu"
+
+      - uid: high_memory_usage
+        title: "High Memory Usage"
+        condition: A
+        data:
+          - refId: A
+            datasourceUid: "${DS_PROMETHEUS}"
+            model:
+              expr: '(process_resident_memory_bytes / machine_memory_bytes) * 100 > 80'
+        noDataState: NoData
+        execErrState: Error
+        for: 5m
+        labels:
+          severity: warning
+          environment: production
+          service: influencer-dashboard
+        annotations:
+          summary: "High memory usage detected"
+          description: "Memory usage has been above 80% for 5 minutes. Current value: {{ $value }}%"
+          runbook_url: "https://wiki.example.com/runbooks/high-memory"
+
+      - uid: critical_memory_usage
+        title: "Critical Memory Usage"
+        condition: A
+        data:
+          - refId: A
+            datasourceUid: "${DS_PROMETHEUS}"
+            model:
+              expr: '(process_resident_memory_bytes / machine_memory_bytes) * 100 > 90'
+        noDataState: NoData
+        execErrState: Error
+        for: 2m
+        labels:
+          severity: critical
+          environment: production
+          service: influencer-dashboard
+        annotations:
+          summary: "Critical memory usage detected"
+          description: "Memory usage has been above 90% for 2 minutes. Current value: {{ $value }}%"
+          runbook_url: "https://wiki.example.com/runbooks/critical-memory"
+
+      - uid: high_response_time
+        title: "High API Response Time"
+        condition: A
+        data:
+          - refId: A
+            datasourceUid: "${DS_PROMETHEUS}"
+            model:
+              expr: 'rate(http_request_duration_seconds_sum[5m]) / rate(http_request_duration_seconds_count[5m]) > 1'
+        noDataState: NoData
+        execErrState: Error
+        for: 5m
+        labels:
+          severity: warning
+          environment: production
+          service: influencer-dashboard
+        annotations:
+          summary: "High API response time detected"
+          description: "API response time has been above 1 second for 5 minutes. Current value: {{ $value }}s"
+          runbook_url: "https://wiki.example.com/runbooks/high-response-time"
+
+      - uid: critical_response_time
+        title: "Critical API Response Time"
+        condition: A
+        data:
+          - refId: A
+            datasourceUid: "${DS_PROMETHEUS}"
+            model:
+              expr: 'rate(http_request_duration_seconds_sum[5m]) / rate(http_request_duration_seconds_count[5m]) > 3'
+        noDataState: NoData
+        execErrState: Error
+        for: 2m
+        labels:
+          severity: critical
+          environment: production
+          service: influencer-dashboard
+        annotations:
+          summary: "Critical API response time detected"
+          description: "API response time has been above 3 seconds for 2 minutes. Current value: {{ $value }}s"
+          runbook_url: "https://wiki.example.com/runbooks/critical-response-time"
+
+      - uid: high_error_rate
+        title: "High Error Rate"
+        condition: A
+        data:
+          - refId: A
+            datasourceUid: "${DS_PROMETHEUS}"
+            model:
+              expr: 'sum(rate(http_requests_total{status=~"5.."}[5m])) / sum(rate(http_requests_total[5m])) * 100 > 5'
+        noDataState: NoData
+        execErrState: Error
+        for: 2m
+        labels:
+          severity: warning
+          environment: production
+          service: influencer-dashboard
+        annotations:
+          summary: "High error rate detected"
+          description: "Error rate has been above 5% for 2 minutes. Current value: {{ $value }}%"
+          runbook_url: "https://wiki.example.com/runbooks/high-error-rate"
+
+      - uid: critical_error_rate
+        title: "Critical Error Rate"
+        condition: A
+        data:
+          - refId: A
+            datasourceUid: "${DS_PROMETHEUS}"
+            model:
+              expr: 'sum(rate(http_requests_total{status=~"5.."}[5m])) / sum(rate(http_requests_total[5m])) * 100 > 10'
+        noDataState: NoData
+        execErrState: Error
+        for: 1m
+        labels:
+          severity: critical
+          environment: production
+          service: influencer-dashboard
+        annotations:
+          summary: "Critical error rate detected"
+          description: "Error rate has been above 10% for 1 minute. Current value: {{ $value }}%"
+          runbook_url: "https://wiki.example.com/runbooks/critical-error-rate"
+
+      - uid: service_down
+        title: "Service Down"
+        condition: A
+        data:
+          - refId: A
+            datasourceUid: "${DS_PROMETHEUS}"
+            model:
+              expr: 'up{job="influencer-dashboard"} == 0'
+        noDataState: Alerting
+        execErrState: Alerting
+        for: 1m
+        labels:
+          severity: critical
+          environment: production
+          service: influencer-dashboard
+        annotations:
+          summary: "Service is down"
+          description: "The influencer-dashboard service is not responding"
+          runbook_url: "https://wiki.example.com/runbooks/service-down"
+
+      - uid: database_down
+        title: "Database Down"
+        condition: A
+        data:
+          - refId: A
+            datasourceUid: "${DS_PROMETHEUS}"
+            model:
+              expr: 'mongodb_up == 0'
+        noDataState: Alerting
+        execErrState: Alerting
+        for: 1m
+        labels:
+          severity: critical
+          environment: production
+          service: mongodb
+        annotations:
+          summary: "MongoDB is down"
+          description: "MongoDB database is not responding"
+          runbook_url: "https://wiki.example.com/runbooks/mongodb-down"
+
+      - uid: cache_down
+        title: "Cache Down"
+        condition: A
+        data:
+          - refId: A
+            datasourceUid: "${DS_PROMETHEUS}"
+            model:
+              expr: 'redis_up == 0'
+        noDataState: Alerting
+        execErrState: Alerting
+        for: 1m
+        labels:
+          severity: critical
+          environment: production
+          service: redis
+        annotations:
+          summary: "Redis is down"
+          description: "Redis cache is not responding"
+          runbook_url: "https://wiki.example.com/runbooks/redis-down"
+
+      - uid: high_api_requests
+        title: "High API Request Volume"
+        condition: A
+        data:
+          - refId: A
+            datasourceUid: "${DS_PROMETHEUS}"
+            model:
+              expr: 'sum(rate(http_requests_total[5m])) > 500'
+        noDataState: NoData
+        execErrState: Error
+        for: 5m
+        labels:
+          severity: warning
+          environment: production
+          service: influencer-dashboard
+        annotations:
+          summary: "High API request volume"
+          description: "API is receiving more than 500 requests per second for 5 minutes. Current value: {{ $value }} req/s"
+          runbook_url: "https://wiki.example.com/runbooks/high-api-requests"

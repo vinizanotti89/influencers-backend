@@ -1,0 +1,41 @@
+services:
+  client:
+    build:
+      context: ${PWD}/client
+      dockerfile: ${PWD}/Docker/client/Dockerfile
+    ports:
+      - "3000:3000"
+    volumes:
+      - ${PWD}/client:/app
+      - /app/node_modules
+    environment:
+      - NODE_ENV=development
+    depends_on:
+      - server
+
+  server:
+    build:
+      context: ${PWD}/server
+      dockerfile: ${PWD}/Docker/server/Dockerfile
+    ports:
+      - "3003:3003"
+    volumes:
+      - ${PWD}/server:/app
+      - /app/node_modules
+    environment:
+      - NODE_ENV=development
+      - MONGODB_URI=${MONGODB_URI}
+    depends_on:
+      - redis
+
+  redis:
+    image: redis:latest
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+      - ${PWD}/server/monitoring/grafana/provisioning/redis.conf:/usr/local/etc/redis/redis.conf
+    command: redis-server /usr/local/etc/redis/redis.conf
+
+volumes:
+  redis_data:

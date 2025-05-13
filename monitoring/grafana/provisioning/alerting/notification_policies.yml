@@ -1,0 +1,104 @@
+apiVersion: 1
+
+contactPoints:
+  - orgId: 1
+    name: "email-notifications"
+    receivers:
+      - uid: "email-primary"
+        type: "email"
+        settings:
+          addresses: "${ALERT_EMAIL_PRIMARY}"  # Usar variável em vez de email hardcoded
+          singleEmail: false
+        disableResolveMessage: false
+
+  - orgId: 1
+    name: "urgent-notifications"
+    receivers:
+      - uid: "email-urgent"
+        type: "email"
+        settings:
+          addresses: "${ALERT_EMAIL_URGENT}"  # Usar variável em vez de email hardcoded
+          singleEmail: false
+        disableResolveMessage: false
+      # Adicionar outros canais de notificação para alertas críticos
+      - uid: "slack-alerts"
+        type: "slack"
+        settings:
+          url: "${SLACK_WEBHOOK_URL}"  # Variável para webhook do Slack
+          username: "Influencer Dashboard Alerts"
+          title: "{{ .CommonLabels.alertname }}"
+          text: "{{ .CommonAnnotations.description }}"
+          mentionChannel: "here"
+        disableResolveMessage: false
+
+  - orgId: 1
+    name: "operations-team"
+    receivers:
+      - uid: "ops-email"
+        type: "email"
+        settings:
+          addresses: "${ALERT_EMAIL_OPS}"  # Email da equipe de operações
+          singleEmail: false
+        disableResolveMessage: false
+
+  - orgId: 1
+    name: "developer-notifications"
+    receivers:
+      - uid: "dev-email"
+        type: "email"
+        settings:
+          addresses: "${ALERT_EMAIL_DEVS}"  # Email dos desenvolvedores
+          singleEmail: true
+        disableResolveMessage: false
+
+policies:
+  - orgId: 1
+    receiver: "email-notifications"  # Receiver padrão
+    group_by: ['alertname', 'service']
+    group_wait: 30s
+    group_interval: 5m
+    repeat_interval: 4h
+    routes:
+      # Rota para alertas críticos
+      - receiver: "urgent-notifications"
+        matchers:
+          - severity = 'critical'
+        group_wait: 30s
+        group_interval: 5m
+        repeat_interval: 30m
+        continue: true  # Continua avaliação para outras rotas
+      
+      # Rota para alertas relacionados à infraestrutura
+      - receiver: "operations-team"
+        matchers:
+          - service =~ 'mongodb|redis|prometheus'
+        group_wait: 30s
+        group_interval: 5m
+        repeat_interval: 2h
+        
+      # Rota para alertas relacionados à aplicação
+      - receiver: "developer-notifications"
+        matchers:
+          - service = 'influencer-dashboard'
+          - severity = 'warning'
+        group_wait: 30s
+        group_interval: 10m
+        repeat_interval: 4h
+
+      # Rota padrão para alertas de warning
+      - receiver: "email-notifications"
+        matchers:
+          - severity = 'warning'
+        group_wait: 30s
+        group_interval: 5m
+        repeat_interval: 4h
+
+# Mute timings para manutenção programada
+muteTimeIntervals:
+  - name: maintenance-window
+    time_intervals:
+      - weekdays: ['saturday', 'sunday']
+        times:
+          - start_time: '02:00'
+            end_time: '06:00'
+      # Pode adicionar outros intervalos de manutenção, como primeiros domingos do mês, etc.
