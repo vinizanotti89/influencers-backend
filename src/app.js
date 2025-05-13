@@ -14,6 +14,12 @@ import apiRoutes from './routes/api.js';
 import socialApiRoutes from './routes/socialApiRoutes.js';
 
 
+process.on('uncaughtException', (err) => {
+  console.error('[FATAL] Uncaught Exception:', err);
+});
+process.on('unhandledRejection', (reason, promise) => {
+  console.error('[FATAL] Unhandled Rejection at:', promise, 'reason:', reason);
+});
 
 // Carregar variáveis de ambiente
 dotenv.config();
@@ -61,7 +67,7 @@ const connectToDatabase = async () => {
     });
     logger.info('Connected to MongoDB');
   } catch (error) {
-    logger.error('MongoDB connection error:', error);
+    console.error('MongoDB connection error:', error);
     process.exit(1);
   }
 };
@@ -89,5 +95,6 @@ export { app, startServer };
 
 // Iniciar o servidor se este arquivo for executado diretamente
 if (process.env.NODE_ENV !== 'test') {
+  console.log('[DEBUG] startServer() is being called');
   startServer();
 }
