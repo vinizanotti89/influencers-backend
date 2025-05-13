@@ -61,13 +61,15 @@ app.use((err, req, res, next) => {
 // Função para conectar ao MongoDB
 const connectToDatabase = async () => {
   try {
-    await mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/influencer-platform', {
+    console.log('[DEBUG] Connecting to Mongo:', process.env.MONGODB_URI);
+    await mongoose.connect(process.env.MONGODB_URI, {
       useNewUrlParser: true,
       useUnifiedTopology: true,
     });
     logger.info('Connected to MongoDB');
   } catch (error) {
-    console.error('MongoDB connection error:', error);
+    console.error('[ERROR] MongoDB connection failed:', error.message);
+    logger.error(error.stack);
     process.exit(1);
   }
 };
