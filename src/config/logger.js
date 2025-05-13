@@ -3,7 +3,7 @@ import path from 'path';
 import fs from 'fs';
 
 // Cria o diretório de logs se não existir
-const logDir = path.join(process.cwd(), 'logs');
+const logDir = path.join('/tmp', 'logs');
 if (!fs.existsSync(logDir)) {
   fs.mkdirSync(logDir, { recursive: true });
 }

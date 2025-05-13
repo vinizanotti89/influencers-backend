@@ -1,4 +1,3 @@
-// server/src/app.js
 import express from 'express';
 import cors from 'cors';
 import mongoose from 'mongoose';
@@ -63,13 +62,16 @@ const connectToDatabase = async () => {
 // Função para iniciar o servidor
 const startServer = async () => {
   try {
+    console.log('[INIT] Starting server...');
     await connectToDatabase();
+    console.log('[DB] Mongo connected');
 
     const PORT = process.env.PORT || 3003;
     app.listen(PORT, () => {
       logger.info(`Server running on port ${PORT}`);
     });
   } catch (error) {
+    console.error('[FAIL] Server startup error:', error);
     logger.error('Failed to start server:', error);
     process.exit(1);
   }
