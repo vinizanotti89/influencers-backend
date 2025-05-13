@@ -4,10 +4,10 @@ import express from 'express';
 import cors from 'cors';
 import mongoose from 'mongoose';
 import helmet from 'helmet';
-import morgan from 'morgan';
-console.log('[DEBUG] core modules imported');
 import dotenv from 'dotenv';
 console.log('[DEBUG] dotenv loaded');
+import morgan from 'morgan';
+console.log('[DEBUG] core modules imported');
 import logger from './config/logger.js';
 console.log('[DEBUG] custom modules imported');
 import apiRoutes from './routes/api.js';
@@ -30,7 +30,7 @@ app.use(express.json()); // Parsear JSON
 app.use(express.urlencoded({ extended: true })); // Parsear URL-encoded
 
 // Logging
-app.use(morgan('dev', { stream: { write: message => logger.info(message.trim()) } }));
+app.use(morgan('dev', { stream: { write: message => console.log('[MORGAN]', message.trim()) } }));
 
 // Rotas de API
 app.use('/api', apiRoutes);
