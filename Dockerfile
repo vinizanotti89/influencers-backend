@@ -28,4 +28,4 @@ EXPOSE 3003
 RUN ls -la && ls -la src/
 
 # Comando para iniciar a aplicação (usando o novo index.js)
-CMD ["node", "src/index.js"]
+CMD ["node", "src/app.js"]

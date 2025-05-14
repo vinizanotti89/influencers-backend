@@ -9,22 +9,22 @@ const router = express.Router();
 
 // Rotas de Autenticação OAuth
 router.get('/auth/instagram/url', SocialAuthController.getInstagramAuthUrl);
-router.get('/auth/instagram/callback', SocialAuthController.handleInstagramCallback);
-router.post('/auth/instagram', authMiddleware.optional, SocialAuthController.handleInstagramCallback); // Endpoint para frontend
+router.get('/auth/instagram/callback', SocialAuthController.authenticateInstagram);
+router.post('/auth/instagram', authMiddleware.optional, SocialAuthController.authenticateInstagram); // Endpoint para frontend
 router.delete('/auth/instagram', authMiddleware.required, SocialAuthController.disconnectInstagram);
 
 router.get('/auth/youtube/url', SocialAuthController.getYouTubeAuthUrl);
-router.get('/auth/youtube/callback', SocialAuthController.handleYouTubeCallback);
-router.post('/auth/youtube', authMiddleware.optional, SocialAuthController.handleYouTubeCallback); // Endpoint para frontend
+router.get('/auth/youtube/callback', SocialAuthController.authenticateYouTube);
+router.post('/auth/youtube', authMiddleware.optional, SocialAuthController.authenticateYouTube);// Endpoint para frontend
 router.delete('/auth/youtube', authMiddleware.required, SocialAuthController.disconnectYouTube);
 
 router.get('/auth/linkedin/url', SocialAuthController.getLinkedInAuthUrl);
-router.get('/auth/linkedin/callback', SocialAuthController.handleLinkedInCallback);
-router.post('/auth/linkedin', authMiddleware.optional, SocialAuthController.handleLinkedInCallback); // Endpoint para frontend
+router.get('/auth/linkedin/callback', SocialAuthController.authenticateLinkedIn);
+router.post('/auth/linkedin', authMiddleware.optional, SocialAuthController.authenticateLinkedIn); // Endpoint para frontend
 router.delete('/auth/linkedin', authMiddleware.required, SocialAuthController.disconnectLinkedIn);
 
 // Status de conexão das redes sociais
-router.get('/auth/connections', authMiddleware.required, SocialAuthController.getConnectionStatus);
+// router.get('/auth/connections', authMiddleware.required, SocialAuthController.getConnectionStatus);
 
 // Rotas da API de Redes Sociais
 router.get('/social/instagram/profile', SocialApiController.getInstagramProfile);
