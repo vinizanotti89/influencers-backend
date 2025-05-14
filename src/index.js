@@ -28,7 +28,7 @@ try {
       console.error('[STARTUP] Tentando importar app.js original como fallback...');
       
       // Se falhar, tenta importar o app original como fallback
-      import('./src/app.js')
+      import('./app.js')
         .then(() => {
           console.log('[STARTUP] app.js importado e inicializado com sucesso');
         })
