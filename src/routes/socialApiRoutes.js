@@ -14,6 +14,6 @@ router.get('/youtube/analyze/:channelIdentifier', SocialApiController.analyzeYou
 
 // LinkedIn
 router.get('/linkedin/profile', authMiddleware, SocialApiController.getLinkedInProfile);
-router.get('/linkedin/analyze', authMiddleware, SocialApiController.analyzeLinkedInInfluencer);
+router.get('/linkedin/analyze', authMiddleware, SocialApiController.analyzeLinkedInProfile);
 
 export default router;
