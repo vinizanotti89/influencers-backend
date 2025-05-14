@@ -130,7 +130,7 @@ class SocialApiController {
                     mine: true
                 },
                 headers: {
-                    Authorization: `Bearer ${token.accessToken}`
+                    Authorization: `Bearer ${access_token}`
                 }
             });
 
@@ -334,7 +334,7 @@ class SocialApiController {
                     fields: 'id,localizedFirstName,localizedLastName,profilePicture(displayImage~:playableStreams)'
                 },
                 headers: {
-                    Authorization: `Bearer ${token.accessToken}`
+                    Authorization: `Bearer ${access_token}`
                 }
             });
 
@@ -479,6 +479,56 @@ class SocialApiController {
      * @param {Object} req - Requisição Express
      * @param {Object} res - Resposta Express
      */
+
+    static async analyzeLinkedInInfluencer(req, res) {
+        try {
+            if (!req.user) {
+                return res.status(401).json({ error: 'Authentication required' });
+            }
+
+            const token = await OAuthService.getUserToken(req.user.id, 'linkedin');
+
+            if (!token || !token.accessToken) {
+                return res.status(400).json({ error: 'No LinkedIn access token found' });
+            }
+
+            const headers = {
+                Authorization: `Bearer ${access_token}`,
+                'cache-control': 'no-cache',
+                'X-Restli-Protocol-Version': '2.0.0'
+            };
+
+            // Buscar dados do perfil
+            const profileRes = await axios.get('https://api.linkedin.com/v2/me', { headers });
+            const profileData = profileRes.data;
+
+            // Buscar imagem do perfil
+            const pictureRes = await axios.get(
+                'https://api.linkedin.com/v2/me?projection=(profilePicture(displayImage~:playableStreams))',
+                { headers }
+            );
+
+            const pictureElements =
+                pictureRes.data.profilePicture?.['displayImage~']?.elements || [];
+
+            const imageUrl =
+                pictureElements.length > 0
+                    ? pictureElements[pictureElements.length - 1].identifiers[0].identifier
+                    : null;
+
+            const userSummary = {
+                name: `${profileData.localizedFirstName || ''} ${profileData.localizedLastName || ''}`.trim(),
+                id: profileData.id || null,
+                profilePicture: imageUrl,
+                // Headline ou localização você pode extrair se necessário via outros endpoints (LinkedIn limita)
+            };
+
+            return res.json(userSummary);
+        } catch (error) {
+            logger.error('Error analyzing LinkedIn influencer:', error?.response?.data || error.message);
+            return res.status(500).json({ error: 'Failed to fetch LinkedIn profile data' });
+        }
+    }
     static async getConnections(req, res) {
         try {
             if (!req.user) {

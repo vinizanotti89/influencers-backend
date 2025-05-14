@@ -6,14 +6,14 @@ const router = express.Router();
 
 // Instagram
 router.get('/instagram/profile', authMiddleware, SocialApiController.getInstagramProfile);
-router.get('/instagram/analyze/:username', SocialApiController.analyzeInstagramInfluencer);
+router.get('/instagram/analyze/:username', SocialApiController.analyzeInstagramProfile);
 
 // YouTube
-router.get('/youtube/channel', authMiddleware, SocialApiController.getYoutubeChannel);
-router.get('/youtube/analyze/:channelIdentifier', SocialApiController.analyzeYoutubeInfluencer);
+router.get('/youtube/channel', authMiddleware, SocialApiController.getYouTubeChannel);
+router.get('/youtube/analyze/:channelIdentifier', SocialApiController.analyzeYouTubeChannel);
 
 // LinkedIn
-router.get('/linkedin/profile', authMiddleware, SocialApiController.getLinkedinProfile);
-router.get('/linkedin/analyze/:username', SocialApiController.analyzeLinkedinInfluencer);
+router.get('/linkedin/profile', authMiddleware, SocialApiController.getLinkedInProfile);
+router.get('/linkedin/analyze', authMiddleware, SocialApiController.analyzeLinkedInInfluencer);
 
 export default router;

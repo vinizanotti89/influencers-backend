@@ -10,13 +10,13 @@ router.post('/instagram', SocialAuthController.authenticateInstagram);
 router.post('/instagram/disconnect', authMiddleware, SocialAuthController.disconnectInstagram);
 
 // YouTube
-router.get('/youtube/url', SocialAuthController.getYoutubeAuthUrl);
-router.post('/youtube', SocialAuthController.authenticateYoutube);
-router.post('/youtube/disconnect', authMiddleware, SocialAuthController.disconnectYoutube);
+router.get('/youtube/url', SocialAuthController.getYouTubeAuthUrl); 
+router.post('/youtube', SocialAuthController.authenticateYouTube);
+router.post('/youtube/disconnect', authMiddleware, SocialAuthController.disconnectYouTube);
 
 // LinkedIn
-router.get('/linkedin/url', SocialAuthController.getLinkedinAuthUrl);
-router.post('/linkedin', SocialAuthController.authenticateLinkedin);
-router.post('/linkedin/disconnect', authMiddleware, SocialAuthController.disconnectLinkedin);
+router.get('/linkedin/url', SocialAuthController.getLinkedInAuthUrl); 
+router.post('/linkedin', SocialAuthController.authenticateLinkedIn);
+router.post('/linkedin/disconnect', authMiddleware, SocialAuthController.disconnectLinkedIn);
 
 export default router;
