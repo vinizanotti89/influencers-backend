@@ -17,7 +17,7 @@ console.log('[STARTUP] Tentando iniciar a aplicação...');
 // Primeiro, tenta importar a versão simplificada do app
 try {
   console.log('[STARTUP] Tentando importar app-simple.js');
-  import('./src/app-simple.js')
+  import('./app-simple.js')
     .then(() => {
       console.log('[STARTUP] app-simple.js importado e inicializado com sucesso');
     })
