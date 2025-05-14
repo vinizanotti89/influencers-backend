@@ -3,7 +3,7 @@ import { OAuthService } from '../services/oauthService.js';
 import logger from '../config/logger.js';
 import { Influencer } from '../models/Influencer.js';
 
-export class SocialApiController {
+class SocialApiController {
     /**
      * Recupera o perfil do Instagram do usuário autenticado
      * @param {Object} req - Requisição Express

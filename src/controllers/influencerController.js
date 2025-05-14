@@ -1,7 +1,7 @@
 import { InfluencerService } from '../services/influencerService.js';
 import logger from '../config/logger.js';
 
-export class InfluencerController {
+class InfluencerController {
   /**
    * Recupera todos os influenciadores com opções de filtragem
    * @param {Object} req - Requisição Express

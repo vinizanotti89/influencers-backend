@@ -1,7 +1,7 @@
 import { ReportService } from '../services/reportService.js';
 import logger from '../config/logger.js';
 
-export class ReportController {
+class ReportController {
   /**
    * Gera um novo relatório
    * @param {Object} req - Requisição Express
@@ -126,3 +126,5 @@ export class ReportController {
     }
   }
 }
+
+export default ReportController;

@@ -1,15 +1,21 @@
 import express from 'express';
-import { SocialAuthController } from '../controllers/socialAuthController.js';
-import { SocialApiController } from '../controllers/socialApiController.js';
-import { ReportController } from '../controllers/reportController.js';
-import { InfluencerController } from '../controllers/influencerController.js';
-import { authMiddleware } from '../middleware/auth.js';
+import SocialAuthController from '../controllers/socialAuthController.js';
+import SocialApiController from '../controllers/socialApiController.js';
+import ReportController from '../controllers/reportController.js';
+import InfluencerController from '../controllers/influencerController.js';
+import authMiddleware from '../middleware/auth.js';
 
 const router = express.Router();
 
 // Rotas de Autenticação OAuth
 router.get('/auth/instagram/url', SocialAuthController.getInstagramAuthUrl);
-router.get('/auth/instagram/callback', SocialAuthController.authenticateInstagram);
+if (!SocialAuthController.getInstagramAuthUrl) {
+    console.error('[FATAL] Method getInstagramAuthUrl is undefined in SocialAuthController');
+    SocialAuthController.getInstagramAuthUrl = (req, res) => {
+        res.status(500).json({ error: 'Method not implemented' });
+    };
+}
+router.get('/auth/instagram/url', SocialAuthController.getInstagramAuthUrl);
 router.post('/auth/instagram', authMiddleware.optional, SocialAuthController.authenticateInstagram); // Endpoint para frontend
 router.delete('/auth/instagram', authMiddleware.required, SocialAuthController.disconnectInstagram);
 

@@ -1,6 +1,6 @@
 import express from 'express';
-import { SocialAuthController } from '../controllers/socialAuthController.js';
-import { authMiddleware } from '../middleware/auth.js';
+import SocialAuthController from '../controllers/socialAuthController.js';
+import authMiddleware from '../middleware/auth.js';
 
 const router = express.Router();
 

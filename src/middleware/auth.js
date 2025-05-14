@@ -7,7 +7,7 @@ const JWT_SECRET = process.env.JWT_SECRET || 'seu-segredo-jwt-super-secreto';
 /**
  * Middleware para lidar com autenticação JWT
  */
-export const authMiddleware = {
+const authMiddleware = {
   /**
    * Middleware que requer autenticação
    * @param {Object} req - Requisição Express

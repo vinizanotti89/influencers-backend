@@ -1,6 +1,6 @@
 import express from 'express';
-import { SocialApiController } from '../controllers/socialApiController.js';
-import { authMiddleware } from '../middleware/auth.js';
+import SocialApiController from '../controllers/socialApiController.js';
+import authMiddleware from '../middleware/auth.js';
 
 const router = express.Router();
 

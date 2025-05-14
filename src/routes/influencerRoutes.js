@@ -1,7 +1,7 @@
 import express from 'express';
-import { InfluencerController } from '../controllers/influencerController.js';
+import InfluencerController from '../controllers/influencerController.js';
 import { validateRequest } from '../middleware/validator.js';
-import { authMiddleware } from '../middleware/auth.js';
+import authMiddleware from '../middleware/auth.js';
 import { cacheMiddleware } from '../config/redis.js';
 
 const router = express.Router();

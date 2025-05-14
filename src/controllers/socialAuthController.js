@@ -2,7 +2,7 @@ import axios from 'axios';
 import { OAuthService } from '../services/oauthService.js';
 import logger from '../config/logger.js';
 
-export class SocialAuthController {
+class SocialAuthController {
   /**
    * Gera URL de autenticação para Instagram
    * @param {Object} req - Requisição Express
