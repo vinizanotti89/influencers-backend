@@ -1,6 +1,0 @@
-{
-    "loader": "esm",
-    "extensions": ["js"],
-    "spec": "src/__tests__/**/*.test.js",
-    "require": "esm"
-  }

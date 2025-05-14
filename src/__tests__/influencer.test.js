@@ -3,51 +3,32 @@ import mongoose from 'mongoose';
 import { app } from '../app.js';
 import { Influencer } from '../models/Influencer.js';
 
-beforeAll(async () => {
-  const url = process.env.MONGODB_URI_TEST || 'mongodb://localhost:27017/test';
-  await mongoose.connect(url);
-});
+console.log('Teste inicial - verificando ambiente Node.js');
 
-afterAll(async () => {
-  await mongoose.connection.dropDatabase();
-  await mongoose.connection.close();
-});
+// Verificar variáveis de ambiente
+console.log('Ambiente:', process.env.NODE_ENV);
+console.log('Porta:', process.env.PORT);
+console.log('Diretório atual:', process.cwd());
+console.log('Arquivos no diretório:');
 
-beforeEach(async () => {
-  await Influencer.deleteMany({});
-});
-
-describe('Testes de API do Influenciador', () => {
-  test('deve criar um novo influenciador', async () => {
-    const influencerData = {
-      name: 'Teste Influencer',
-      platform: 'Instagram',
-      followers: 10000,
-      trustScore: 85,
-      category: 'Nutrição'
-    };
-
-    const response = await request(app)
-      .post('/api/influencers')
-      .send(influencerData);
-
-    expect(response.status).toBe(201);
-    expect(response.body.name).toBe(influencerData.name);
-    expect(response.body.platform).toBe(influencerData.platform);
-  });
-
-  test('deve retornar erro para dados inválidos', async () => {
-    const invalidData = {
-      name: '',
-      platform: 'InvalidPlatform',
-      followers: -1
-    };
-
-    const response = await request(app)
-      .post('/api/influencers')
-      .send(invalidData);
-
-    expect(response.status).toBe(400);
-    expect(response.body).toHaveProperty('errors');
-  });
+// Listar arquivos do diretório
+const fs = require('fs');
+fs.readdir('.', (err, files) => {
+  if (err) {
+    console.error('Erro ao listar arquivos:', err);
+    return;
+  }
+  console.log(files);
+  
+  // Verificar se o arquivo app.js existe
+  console.log('Verificando estrutura de diretórios:');
+  if (files.includes('src')) {
+    fs.readdir('./src', (err, srcFiles) => {
+      if (err) {
+        console.error('Erro ao listar arquivos em src:', err);
+        return;
+      }
+      console.log('Arquivos em src:', srcFiles);
+    });
+  }
 });

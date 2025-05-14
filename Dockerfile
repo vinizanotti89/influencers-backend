@@ -13,8 +13,19 @@ RUN npm install
 # Copiar arquivos do projeto
 COPY . .
 
+# Criar diretório de logs (para evitar erros com o logger)
+RUN mkdir -p /tmp/logs
+
+# Definir variáveis de ambiente padrão
+ENV NODE_ENV=production
+ENV PORT=3003
+ENV LOG_LEVEL=info
+
 # Expor porta
 EXPOSE 3003
 
-# Comando para iniciar a aplicação
-CMD ["node", "src/app.js"]
+# Verificar a estrutura de diretórios (debug)
+RUN ls -la && ls -la src/
+
+# Comando para iniciar a aplicação (usando o novo index.js)
+CMD ["node", "index.js"]
