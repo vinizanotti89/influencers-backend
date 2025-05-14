@@ -16,13 +16,13 @@ console.log('[STARTUP] Tentando iniciar a aplicação...');
 
 // Primeiro, tenta importar a versão simplificada do app
 try {
-  console.log('[STARTUP] Tentando importar app-simple.js');
-  import('./app-simple.js')
+  console.log('[STARTUP] Tentando importar app-simples.js');
+  import('./app-simples.js')
     .then(() => {
-      console.log('[STARTUP] app-simple.js importado e inicializado com sucesso');
+      console.log('[STARTUP] app-simples.js importado e inicializado com sucesso');
     })
     .catch((error) => {
-      console.error('[STARTUP] Erro ao importar app-simple.js:', error.message);
+      console.error('[STARTUP] Erro ao importar app-simples.js:', error.message);
       console.error('[STARTUP] Stack completo:', error.stack);
       
       console.error('[STARTUP] Tentando importar app.js original como fallback...');
