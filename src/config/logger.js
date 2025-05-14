@@ -2,40 +2,41 @@ import winston from 'winston';
 import path from 'path';
 import fs from 'fs';
 
-// Cria o diretório de logs se não existir
-const logDir = path.join('/tmp', 'logs');
-if (!fs.existsSync(logDir)) {
-  fs.mkdirSync(logDir, { recursive: true });
+// Define se estamos em produção
+const isProd = process.env.NODE_ENV === 'production';
+
+// Diretório de logs apenas em dev
+let logDir;
+if (!isProd) {
+  logDir = path.join('./logs');
+  if (!fs.existsSync(logDir)) {
+    fs.mkdirSync(logDir, { recursive: true });
+  }
 }
 
-// Configuração de formato customizado
+// Formato customizado
 const customFormat = winston.format.combine(
   winston.format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
   winston.format.errors({ stack: true }),
   winston.format.printf(({ level, message, timestamp, stack, ...meta }) => {
     let log = `${timestamp} ${level.toUpperCase()}: ${message}`;
-
-    // Adiciona metadados se existirem
     if (Object.keys(meta).length > 0) {
       log += ` - ${JSON.stringify(meta)}`;
     }
-
-    // Adiciona stack trace para erros
     if (stack) {
       log += `\n${stack}`;
     }
-
     return log;
   })
 );
 
-// Configuração do colorize apenas para console
+// Formato colorido para console
 const consoleFormat = winston.format.combine(
   winston.format.colorize(),
   customFormat
 );
 
-// Níveis de log customizados com cores
+// Definição dos níveis e cores (opcional mas legal)
 const levels = {
   error: 0,
   warn: 1,
@@ -44,7 +45,6 @@ const levels = {
   debug: 4,
 };
 
-// Definir cores para cada nível
 const colors = {
   error: 'red',
   warn: 'yellow',
@@ -53,67 +53,68 @@ const colors = {
   debug: 'blue',
 };
 
-// Adicionar cores ao winston
 winston.addColors(colors);
 
-// Determinar nível de log baseado no ambiente
-const level = () => {
-  const env = process.env.NODE_ENV || 'development';
-  return env === 'development' ? 'debug' : 'info';
-};
+// Nível de log baseado no ambiente
+const level = () => (isProd ? 'info' : 'debug');
 
-// Configuração dos transportes
+// Transportes básicos (console sempre)
 const transports = [
-  // Console para todos os ambientes
   new winston.transports.Console({
     level: level(),
     format: consoleFormat,
   }),
-
-  // Arquivo para todos os logs (info e acima)
-  new winston.transports.File({
-    filename: path.join(logDir, 'combined.log'),
-    level: 'info',
-    format: customFormat,
-    maxsize: 10485760, // 10MB
-    maxFiles: 5,
-  }),
-
-  // Arquivo separado apenas para erros
-  new winston.transports.File({
-    filename: path.join(logDir, 'error.log'),
-    level: 'error',
-    format: customFormat,
-    maxsize: 10485760, // 10MB
-    maxFiles: 5,
-  }),
 ];
 
-// Configuração final do logger
+// Adiciona arquivos de log só em dev
+if (!isProd) {
+  transports.push(
+    new winston.transports.File({
+      filename: path.join(logDir, 'combined.log'),
+      level: 'info',
+      format: customFormat,
+      maxsize: 10485760, // 10MB
+      maxFiles: 5,
+    }),
+    new winston.transports.File({
+      filename: path.join(logDir, 'error.log'),
+      level: 'error',
+      format: customFormat,
+      maxsize: 10485760,
+      maxFiles: 5,
+    })
+  );
+}
+
+// Logger final
 const logger = winston.createLogger({
   level: level(),
   levels,
   format: customFormat,
   transports,
-  exceptionHandlers: [
-    new winston.transports.File({
-      filename: path.join(logDir, 'exceptions.log'),
-      format: customFormat,
-      maxsize: 10485760, // 10MB
-      maxFiles: 5,
-    }),
-  ],
-  rejectionHandlers: [
-    new winston.transports.File({
-      filename: path.join(logDir, 'rejections.log'),
-      format: customFormat,
-      maxsize: 10485760, // 10MB
-      maxFiles: 5,
-    }),
-  ],
+  ...(isProd
+    ? {}
+    : {
+        exceptionHandlers: [
+          new winston.transports.File({
+            filename: path.join(logDir, 'exceptions.log'),
+            format: customFormat,
+            maxsize: 10485760,
+            maxFiles: 5,
+          }),
+        ],
+        rejectionHandlers: [
+          new winston.transports.File({
+            filename: path.join(logDir, 'rejections.log'),
+            format: customFormat,
+            maxsize: 10485760,
+            maxFiles: 5,
+          }),
+        ],
+      }),
 });
 
-// Adiciona método para registrar erros com contexto
+// Métodos utilitários
 logger.errorWithContext = (message, error, context = {}) => {
   logger.error(message, {
     error: {
@@ -124,7 +125,6 @@ logger.errorWithContext = (message, error, context = {}) => {
   });
 };
 
-// Adiciona método para registrar requisições HTTP
 logger.httpRequest = (req, res, responseTime) => {
   const { method, url, ip, headers } = req;
   const { statusCode } = res;
@@ -138,5 +138,6 @@ logger.httpRequest = (req, res, responseTime) => {
   });
 };
 
-// Exporta o logger configurado
+console.log('[CONFIG] Logger carregado corretamente');
+
 export default logger;
