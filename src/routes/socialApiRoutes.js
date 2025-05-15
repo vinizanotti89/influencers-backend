@@ -1,24 +1,29 @@
 import express from 'express';
-import SocialApiController from '../controllers/socialApiController.js';
+// Importando as funções diretamente do controlador
+import * as SocialApi from '../controllers/socialApiController.js';
 import authMiddleware from '../middleware/auth.js';
 
 const router = express.Router();
 
+// Rota básica para testar
+router.get('/test', (req, res) => {
+  res.json({ message: 'API is working!' });
+});
+
 // Instagram
-router.get('/instagram/profile', authMiddleware, SocialApiController.getInstagramProfile);
-router.get('/instagram/analyze/:username', SocialApiController.analyzeInstagramProfile);
+router.get('/instagram/profile', authMiddleware, SocialApi.getInstagramProfile);
+router.get('/instagram/analyze/:username', SocialApi.analyzeInstagramProfile);
 
 // YouTube
-router.get('/youtube/channel', authMiddleware, SocialApiController.getYouTubeChannel);
-// Observe: o parâmetro na rota deve corresponder ao parâmetro no controlador
-router.get('/youtube/analyze/:channelId', SocialApiController.analyzeYouTubeChannel);
+router.get('/youtube/channel', authMiddleware, SocialApi.getYouTubeChannel);
+router.get('/youtube/analyze/:channelId', SocialApi.analyzeYouTubeChannel);
 
 // LinkedIn
-router.get('/linkedin/profile', authMiddleware, SocialApiController.getLinkedInProfile);
-// Adicionando parâmetro username na rota de análise do LinkedIn
-router.get('/linkedin/analyze/:username', authMiddleware, SocialApiController.analyzeLinkedInProfile);
+router.get('/linkedin/profile', authMiddleware, SocialApi.getLinkedInProfile);
+router.get('/linkedin/analyze/:username', authMiddleware, SocialApi.analyzeLinkedInProfile);
+router.get('/linkedin/influencer', authMiddleware, SocialApi.analyzeLinkedInInfluencer);
 
-// Adicionando a rota para connections que existe no controlador mas não estava no arquivo de rotas
-router.get('/connections', authMiddleware, SocialApiController.getConnections);
+// Conexões
+router.get('/connections', authMiddleware, SocialApi.getConnections);
 
 export default router;
