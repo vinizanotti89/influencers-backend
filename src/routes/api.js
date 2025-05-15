@@ -1,48 +1,51 @@
 import express from 'express';
 import SocialAuthController from '../controllers/socialAuthController.js';
-import SocialApiController from '../controllers/socialApiController.js';
+import * as SocialApiController from '../controllers/socialApiController.js';
 import ReportController from '../controllers/reportController.js';
 import InfluencerController from '../controllers/influencerController.js';
 import authMiddleware from '../middleware/auth.js';
 
 const router = express.Router();
 
-// Rotas de Autenticação OAuth
-router.get('/auth/instagram/url', SocialAuthController.getInstagramAuthUrl);
-if (!SocialAuthController.getInstagramAuthUrl) {
-    console.error('[FATAL] Method getInstagramAuthUrl is undefined in SocialAuthController');
-    SocialAuthController.getInstagramAuthUrl = (req, res) => {
-        res.status(500).json({ error: 'Method not implemented' });
+// Verificar métodos críticos no início
+const verifyMethod = (controller, methodName) => {
+  if (!controller[methodName]) {
+    console.error(`[FATAL] Method ${methodName} is undefined in controller`);
+    controller[methodName] = (req, res) => {
+      res.status(500).json({ error: 'Method not implemented' });
     };
-}
-router.get('/auth/instagram/url', SocialAuthController.getInstagramAuthUrl);
-router.post('/auth/instagram', authMiddleware.optional, SocialAuthController.authenticateInstagram); // Endpoint para frontend
+  }
+  return controller[methodName];
+};
+
+// Rotas de Autenticação OAuth para Instagram
+router.get('/auth/instagram/url', verifyMethod(SocialAuthController, 'getInstagramAuthUrl'));
+router.post('/auth/instagram', authMiddleware.optional, SocialAuthController.authenticateInstagram);
 router.delete('/auth/instagram', authMiddleware.required, SocialAuthController.disconnectInstagram);
 
+// Rotas de Autenticação OAuth para YouTube
 router.get('/auth/youtube/url', SocialAuthController.getYouTubeAuthUrl);
 router.get('/auth/youtube/callback', SocialAuthController.authenticateYouTube);
-router.post('/auth/youtube', authMiddleware.optional, SocialAuthController.authenticateYouTube);// Endpoint para frontend
+router.post('/auth/youtube', authMiddleware.optional, SocialAuthController.authenticateYouTube);
 router.delete('/auth/youtube', authMiddleware.required, SocialAuthController.disconnectYouTube);
 
+// Rotas de Autenticação OAuth para LinkedIn
 router.get('/auth/linkedin/url', SocialAuthController.getLinkedInAuthUrl);
 router.get('/auth/linkedin/callback', SocialAuthController.authenticateLinkedIn);
-router.post('/auth/linkedin', authMiddleware.optional, SocialAuthController.authenticateLinkedIn); // Endpoint para frontend
+router.post('/auth/linkedin', authMiddleware.optional, SocialAuthController.authenticateLinkedIn);
 router.delete('/auth/linkedin', authMiddleware.required, SocialAuthController.disconnectLinkedIn);
 
-// Status de conexão das redes sociais
-// router.get('/auth/connections', authMiddleware.required, SocialAuthController.getConnectionStatus);
-
 // Rotas da API de Redes Sociais
-router.get('/social/instagram/profile', SocialApiController.getInstagramProfile);
-router.get('/social/instagram/analyze/:username', SocialApiController.analyzeInstagramProfile);
-
-router.get('/social/youtube/channel', SocialApiController.getYouTubeChannel);
-router.get('/social/youtube/analyze/:channelId', SocialApiController.analyzeYouTubeChannel);
-
-router.get('/social/linkedin/profile', SocialApiController.getLinkedInProfile);
-router.get('/social/linkedin/analyze/:username', SocialApiController.analyzeLinkedInProfile);
-
+// Rotas protegidas (requerem autenticação)
+router.get('/social/instagram/profile', authMiddleware.required, SocialApiController.getInstagramProfile);
+router.get('/social/youtube/channel', authMiddleware.required, SocialApiController.getYouTubeChannel);
+router.get('/social/linkedin/profile', authMiddleware.required, SocialApiController.getLinkedInProfile);
 router.get('/social/connections', authMiddleware.required, SocialApiController.getConnections);
+
+// Rotas públicas (análise de perfis)
+router.get('/social/instagram/analyze/:username', SocialApiController.analyzeInstagramProfile);
+router.get('/social/youtube/analyze/:channelId', SocialApiController.analyzeYouTubeChannel);
+router.get('/social/linkedin/analyze/:username', SocialApiController.analyzeLinkedInProfile);
 
 // Rotas de Influenciadores
 router.get('/influencers', InfluencerController.getAll);
@@ -52,7 +55,7 @@ router.put('/influencers/:id', authMiddleware.required, InfluencerController.upd
 router.delete('/influencers/:id', authMiddleware.required, InfluencerController.delete);
 router.get('/influencers/search', InfluencerController.search);
 
-// Rotas de Relatórios
+// Rotas de Relatórios (todas protegidas)
 router.get('/reports', authMiddleware.required, ReportController.getReports);
 router.get('/reports/:id', authMiddleware.required, ReportController.getReportById);
 router.post('/reports', authMiddleware.required, ReportController.generateReport);
